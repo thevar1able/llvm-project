@@ -3315,6 +3315,7 @@ static bool HandleLValueBase(EvalInfo &Info, const Expr *E, LValue &Obj,
 
   // Extract most-derived object and corresponding type.
   DerivedDecl = D.MostDerivedType->getAsCXXRecordDecl();
+  if (!DerivedDecl) return false;
   if (!CastToDerivedClass(Info, E, Obj, DerivedDecl, D.MostDerivedPathLength))
     return false;
 
