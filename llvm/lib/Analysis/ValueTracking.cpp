@@ -1903,20 +1903,30 @@ static void computeKnownBitsFromOperator(const Operator *I,
       // the second iteration on, so every fact must also hold for the start
       // value alone.
       case Instruction::And:
-      case Instruction::Or: {
+      case Instruction::Or:
+      case Instruction::Xor: {
         KnownBits KnownStep(BitWidth);
         computeKnownBitsForRecurrenceOperands(P, Start, Step, DemandedElts,
                                               KnownStart, KnownStep, Q, Depth);
-        if (Opcode == Instruction::And) {
+        switch (Opcode) {
+        case Instruction::And:
           // Bits that are zero in the start value stay zero, and bits that are
           // one in both the start value and the step stay one.
           Known.Zero |= KnownStart.Zero;
           Known.One |= KnownStart.One & KnownStep.One;
-        } else {
+          break;
+        case Instruction::Or:
           // Bits that are zero in both the start value and the step stay zero,
           // and bits that are one in the start value stay one.
           Known.Zero |= KnownStart.Zero & KnownStep.Zero;
           Known.One |= KnownStart.One;
+          break;
+        case Instruction::Xor:
+          // Bits that are zero in the step are never flipped, so they keep
+          // their value from the start value.
+          Known.Zero |= KnownStart.Zero & KnownStep.Zero;
+          Known.One |= KnownStart.One & KnownStep.Zero;
+          break;
         }
         break;
       }

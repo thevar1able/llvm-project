@@ -754,8 +754,7 @@ define i32 @test_xor_known_zero_high_bits(ptr %p, i64 %n) {
 ; CHECK-NEXT:    [[EC:%.*]] = icmp eq i64 [[IV_NEXT]], [[N:%.*]]
 ; CHECK-NEXT:    br i1 [[EC]], label [[EXIT:%.*]], label [[LOOP]]
 ; CHECK:       exit:
-; CHECK-NEXT:    [[MASKED:%.*]] = and i32 [[ACC_NEXT]], 255
-; CHECK-NEXT:    ret i32 [[MASKED]]
+; CHECK-NEXT:    ret i32 [[ACC_NEXT]]
 ;
 entry:
   br label %loop
@@ -784,17 +783,11 @@ define i32 @test_xor_known_one_start(ptr %p, i64 %n) {
 ; CHECK-NEXT:    br label [[LOOP:%.*]]
 ; CHECK:       loop:
 ; CHECK-NEXT:    [[IV:%.*]] = phi i64 [ 0, [[ENTRY:%.*]] ], [ [[IV_NEXT:%.*]], [[LOOP]] ]
-; CHECK-NEXT:    [[ACC:%.*]] = phi i32 [ 256, [[ENTRY]] ], [ [[ACC_NEXT:%.*]], [[LOOP]] ]
-; CHECK-NEXT:    [[GEP:%.*]] = getelementptr inbounds i8, ptr [[P:%.*]], i64 [[IV]]
-; CHECK-NEXT:    [[X:%.*]] = load i8, ptr [[GEP]], align 1
-; CHECK-NEXT:    [[X_EXT:%.*]] = zext i8 [[X]] to i32
-; CHECK-NEXT:    [[ACC_NEXT]] = xor i32 [[ACC]], [[X_EXT]]
 ; CHECK-NEXT:    [[IV_NEXT]] = add i64 [[IV]], 1
 ; CHECK-NEXT:    [[EC:%.*]] = icmp eq i64 [[IV_NEXT]], [[N:%.*]]
 ; CHECK-NEXT:    br i1 [[EC]], label [[EXIT:%.*]], label [[LOOP]]
 ; CHECK:       exit:
-; CHECK-NEXT:    [[BIT8:%.*]] = and i32 [[ACC]], 256
-; CHECK-NEXT:    ret i32 [[BIT8]]
+; CHECK-NEXT:    ret i32 256
 ;
 entry:
   br label %loop
